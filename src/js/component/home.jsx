@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import { instanceOf } from "prop-types";
+import React, { useState, useEffect } from "react";
 
 //create your first component
 const Home = () => {
@@ -9,6 +10,41 @@ const Home = () => {
 		setPend(prevState =>
 			prevState.filter((todo, index) => index !== indexItem)
 		);
+	};
+
+	const URLBASE = "https://assets.breatheco.de/apis/fake/todos";
+
+	useEffect(() => {
+		let userUrl = URLBASE + "/user/flopez";
+		fetch(userUrl)
+			.then(response => response.json())
+
+			.then(info => {
+				setPend(info);
+				console.log(info);
+			})
+
+			.catch(supererror => console.log("Se rompió"));
+	}, []);
+
+	const agregarTarea = arrayTareas => {
+		let userUrl = URLBASE + "/user/flopez";
+		fetch(userUrl, {
+			method: "PUT",
+			body: JSON.stringify(arrayTareas),
+			headers: {
+				"Content-Type": "application/json"
+			}
+		});
+		fetch(userUrl)
+			.then(response => response.json())
+
+			.then(info => {
+				setPend(info);
+				console.log(info);
+			})
+
+			.catch(supererror => console.log("Se rompió"));
 	};
 
 	return (
@@ -28,8 +64,9 @@ const Home = () => {
 							for (let i = 0; i < pend.length; i++) {
 								mostrarLista.push(pend[i]);
 							}
-							mostrarLista.push(task);
-							setPend(mostrarLista);
+							mostrarLista.push({ label: task, done: false });
+							agregarTarea(mostrarLista);
+							//setPend(mostrarLista);
 							setTask((e.target.value = ""));
 						}
 					}}
@@ -44,7 +81,7 @@ const Home = () => {
 						return (
 							<>
 								<li key={index} className="list-group-item">
-									{items}
+									{items.label}
 									<button
 										className="btn btn-light"
 										onClick={e => {

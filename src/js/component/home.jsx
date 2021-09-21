@@ -6,14 +6,14 @@ const Home = () => {
 	const [pend, setPend] = useState([]);
 
 	const deleteItems = indexItem => {
-		guardarLista(prevState =>
+		setPend(prevState =>
 			prevState.filter((todo, index) => index !== indexItem)
 		);
 	};
 
 	return (
 		<div className="container text-center mt-5">
-			<h1>ToDo's List!</h1>
+			<h1>ToDos List!</h1>
 			<div className="input-group mb-3">
 				<input
 					type="text"
@@ -36,7 +36,6 @@ const Home = () => {
 					onChange={e => {
 						setTask(e.target.value);
 					}}
-					type="text"
 				/>
 			</div>
 			<div>

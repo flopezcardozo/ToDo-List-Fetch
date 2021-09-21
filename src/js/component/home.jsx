@@ -3,13 +3,17 @@ import React, { useState } from "react";
 //create your first component
 const Home = () => {
 	const [task, setTask] = useState("");
-	const [pend, setPend] = useState("");
+	const [pend, setPend] = useState([]);
 
-	const validar = () => {};
+	const deleteItems = indexItem => {
+		guardarLista(prevState =>
+			prevState.filter((todo, index) => index !== indexItem)
+		);
+	};
 
 	return (
 		<div className="container text-center mt-5">
-			<h1>ToDos!</h1>
+			<h1>ToDo's List!</h1>
 			<div className="input-group mb-3">
 				<input
 					type="text"
@@ -17,28 +21,51 @@ const Home = () => {
 					placeholder="What needs to be done?"
 					aria-label="Recipient username"
 					aria-describedby="basic-addon2"
-					onChange={e => setTask(e.target.value)}
 					value={task}
+					onKeyDown={e => {
+						if (e.keyCode == "13") {
+							let mostrarLista = [];
+							for (let i = 0; i < pend.length; i++) {
+								mostrarLista.push(pend[i]);
+							}
+							mostrarLista.push(task);
+							setPend(mostrarLista);
+							setTask((e.target.value = ""));
+						}
+					}}
+					onChange={e => {
+						setTask(e.target.value);
+					}}
+					type="text"
 				/>
-				<div className="input-group-append">
-					<span className="input-group-text" id="basic-addon2">
-						Add
-					</span>
-				</div>
 			</div>
 			<div>
 				<ul className="list-group list-group-flush">
-					<li className="list-group-item">Cras justo odio</li>
-					<li className="list-group-item">Dapibus ac facilisis in</li>
-					<li className="list-group-item">Morbi leo risus</li>
-					<li className="list-group-item">Porta ac consectetur ac</li>
-					<li className="list-group-item">Vestibulum at eros</li>
+					{pend.map((items, index) => {
+						return (
+							<>
+								<li key={index} className="list-group-item">
+									{items}
+									<button
+										className="btn btn-light"
+										onClick={e => {
+											deleteItems(index);
+										}}>
+										<i
+											className="fa fa-times"
+											aria-aria-hidden="true"
+										/>
+									</button>
+								</li>
+							</>
+						);
+					})}
 				</ul>
 			</div>
 			<div className="footer-basic">
-				<footer>
-					<p className="copyright">Company Name © 2018</p>
-				</footer>
+				<p className="card-footer text-muted">
+					Items pendientes: {pend.length}
+				</p>
 			</div>
 		</div>
 	);

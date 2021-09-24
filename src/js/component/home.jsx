@@ -5,14 +5,26 @@ import React, { useState, useEffect } from "react";
 const Home = () => {
 	const [task, setTask] = useState("");
 	const [pend, setPend] = useState([]);
+	const URLBASE = "https://assets.breatheco.de/apis/fake/todos";
 
 	const deleteItems = indexItem => {
 		setPend(prevState =>
 			prevState.filter((todo, index) => index !== indexItem)
 		);
+		let userUrl = URLBASE + "/user/flopez";
+		console.log(pend);
+		let esperarResp = fetch(userUrl, {
+			method: "PUT",
+			body: JSON.stringify(pend),
+			headers: {
+				"Content-Type": "application/json"
+			}
+		});
+		if (esperarResp.ok) {
+			setPend(pend);
+		}
+		return esperarResp;
 	};
-
-	const URLBASE = "https://assets.breatheco.de/apis/fake/todos";
 
 	useEffect(() => {
 		let userUrl = URLBASE + "/user/flopez";
@@ -29,22 +41,14 @@ const Home = () => {
 
 	const agregarTarea = arrayTareas => {
 		let userUrl = URLBASE + "/user/flopez";
-		fetch(userUrl, {
+		let respuesta = fetch(userUrl, {
 			method: "PUT",
 			body: JSON.stringify(arrayTareas),
 			headers: {
 				"Content-Type": "application/json"
 			}
 		});
-		fetch(userUrl)
-			.then(response => response.json())
-
-			.then(info => {
-				setPend(info);
-				console.log(info);
-			})
-
-			.catch(supererror => console.log("Se rompió"));
+		return respuesta;
 	};
 
 	return (
@@ -58,15 +62,19 @@ const Home = () => {
 					aria-label="Recipient username"
 					aria-describedby="basic-addon2"
 					value={task}
-					onKeyDown={e => {
+					onKeyDown={async e => {
 						if (e.keyCode == "13") {
 							let mostrarLista = [];
 							for (let i = 0; i < pend.length; i++) {
 								mostrarLista.push(pend[i]);
 							}
 							mostrarLista.push({ label: task, done: false });
-							agregarTarea(mostrarLista);
-							//setPend(mostrarLista);
+							let respuesta = await agregarTarea(mostrarLista);
+							let userUrl = URLBASE + "/user/flopez";
+							if (respuesta.ok) {
+								setPend(mostrarLista);
+							}
+
 							setTask((e.target.value = ""));
 						}
 					}}
@@ -84,8 +92,8 @@ const Home = () => {
 									{items.label}
 									<button
 										className="btn btn-light"
-										onClick={e => {
-											deleteItems(index);
+										onClick={async e => {
+											await deleteItems(index);
 										}}>
 										<i
 											className="fa fa-times"

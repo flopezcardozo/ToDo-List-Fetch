@@ -11,20 +11,21 @@ const Home = () => {
 		setPend(prevState =>
 			prevState.filter((todo, index) => index !== indexItem)
 		);
+	};
+	useEffect(() => {
 		let userUrl = URLBASE + "/user/flopez";
 		console.log(pend);
-		let esperarResp = fetch(userUrl, {
+		fetch(userUrl, {
 			method: "PUT",
 			body: JSON.stringify(pend),
 			headers: {
 				"Content-Type": "application/json"
 			}
-		});
-		if (esperarResp.ok) {
-			setPend(pend);
-		}
-		return esperarResp;
-	};
+		})
+			.then(response => response.json())
+			.then(data => console.log(data))
+			.catch(error => console.log(error));
+	}, [pend]);
 
 	useEffect(() => {
 		let userUrl = URLBASE + "/user/flopez";
@@ -92,8 +93,8 @@ const Home = () => {
 									{items.label}
 									<button
 										className="btn btn-light"
-										onClick={async e => {
-											await deleteItems(index);
+										onClick={e => {
+											deleteItems(index);
 										}}>
 										<i
 											className="fa fa-times"
